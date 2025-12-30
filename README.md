@@ -3,12 +3,9 @@
 ---
 
 ## Language Selection
-Choose your preferred language for the anticheat interface:
 
 - Arabic language  
 - English language
-
-Place the corresponding folder inside your server **resources** directory to use the desired language.
 
 ---
 
