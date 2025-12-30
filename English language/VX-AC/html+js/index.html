@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vortex Menu</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Exo+2:wght@500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            background: transparent !important;
+            overflow: hidden;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        body {
+            display: none;
+            opacity: 0;
+        }
+
+        body.show {
+            display: block;
+            opacity: 1;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .panel-body {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 70%;
+            background: #0c0c16;
+            border-radius: 16px;
+            border: 1px solid #5a5a82;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .panel-body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(110, 130, 180, 0.14) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(110, 130, 180, 0.14) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .panel-body::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            top: -200px;
+            right: -200px;
+            background: radial-gradient(circle, rgba(130, 160, 220, 0.44) 0%, transparent 65%);
+            filter: blur(90px);
+            z-index: 2;
+        }
+
+        .glow-bottom-left {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            bottom: -200px;
+            left: -200px;
+            background: radial-gradient(circle, rgba(130, 160, 220, 0.44) 0%, transparent 65%);
+            filter: blur(90px);
+            z-index: 2;
+        }
+
+        nav {
+            position: fixed;
+            left: 1%;
+            top: 2.5%;
+            width: 5%;
+            height: 95%;
+            background: #0f0f1e;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            gap: 55px;
+            z-index: 100;
+            border: 1px solid #646e96;
+        }
+
+        nav a {
+            color: #a0a8cc;
+            font-size: 32px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #d0d8ff;
+            transform: scale(1.1);
+        }
+
+        nav img {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            border: 2px solid #9099bb;
+            transition: all 0.3s ease;
+        }
+
+        nav img:hover {
+            border-color: #d0d8ff;
+        }
+
+        section {
+            position: absolute;
+            top: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            right: 1%;
+            top: 2.5%;
+            width: 92%;
+            height: 95%;
+            z-index: 10;
+        }
+
+        section.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        section h1 {
+            color: #bbc3e0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            margin-left: 0.5%;
+            text-transform: uppercase;
+        }
+
+        .general-container {
+            position: relative;
+            left: 0.5%;
+            width: 99%;
+            height: 89%;
+            z-index: 5;
+        }
+
+        .first-section {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 15px;
+            height: 55%;
+        }
+
+        .card {
+            width: 30%;
+            height: 92%;
+            background: #141628;
+            border-radius: 12px;
+            border: 1px solid #646e96;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            background: #1e213c;
+            padding: 12px 20px;
+            text-align: center;
+            border-radius: 8px;
+            color: #b0b8dd;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .card-desc {
+            color: #e0e4ff;
+            margin: 20px 0;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-desc i {
+            color: #9099cc;
+        }
+
+        .second-section {
+            position: relative;
+            width: 95.5%;
+            left: 0.9%;
+            height: 42%;
+            background: #141628;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid #646e96;
+            transition: all 0.3s ease;
+        }
+
+        .second-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e213c;
+            padding: 10px 50px;
+            border-radius: 8px;
+            color: #b0b8dd;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 21px;
+        }
+
+        .section-actions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 40px;
+        }
+
+        .action-button {
+            padding: 16px 70px;
+            background: #23284b;
+            color: #e0e4ff;
+            font-weight: bold;
+            font-size: 17px;
+            border: 1px solid #6e78aa;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background: #37416e;
+            border-color: #8c96c8;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-conainer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 15px 10px 15px;
+        }
+
+        #SearchInput, #SearchInputCard, #SearchUnbanInput {
+            width: 40%;
+            padding: 14px 20px;
+            background: #191c37;
+            border: 1px solid #646e96;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 17px;
+            transition: all 0.3s ease;
+        }
+
+        #SearchInput:focus, #SearchInputCard:focus, #SearchUnbanInput:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+        }
+
+        .button {
+            padding: 14px 25px;
+            background: #23284b;
+            color: #e0e4ff;
+            border: 1px solid #6e78aa;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .button:hover {
+            background: #414b78;
+            border-color: #a0aadc;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .tableContainer {
+            height: 530px;
+            overflow-y: auto;
+            margin: 10px 15px;
+        }
+
+        #PlayerTable {
+            width: 99%;
+            margin-left: 0.5%;
+            border-collapse: collapse;
+            font-size: 17px;
+        }
+
+        #PlayerTable th {
+            background: #23264b;
+            color: #c8d0ff;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+        }
+
+        #PlayerTable td {
+            background: #191c3c;
+            color: #e8ecff;
+            padding: 12px;
+            transition: all 0.2s ease;
+        }
+
+        #PlayerTable tr {
+            border-bottom: 1px solid #6e78aa;
+        }
+
+        #PlayerTable tr:hover td {
+            background: #23264b;
+        }
+
+        .BanContainer {
+            height: 530px;
+            overflow-y: auto;
+            margin: 10px 15px;
+        }
+
+        .ban-card {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid #e74c3c;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            transition: 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ban-card:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        .ban-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            flex: 1;
+        }
+
+        .ban-name {
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .ban-code {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .ban-details {
+            font-size: 14px;
+            color: #95a5a6;
+            flex: 1;
+        }
+
+        .unban-button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .unban-button:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+        }
+
+        #actionModal, #unbanModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            width: 420px;
+            background: #141628;
+            border: 1px solid #646e96;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 0 60px rgba(100, 130, 220, 0.7);
+        }
+
+        .modal-title {
+            text-align: center;
+            font-family: 'Orbitron';
+            font-size: 28px;
+            color: #00d4ff;
+            margin-bottom: 25px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 14px;
+            background: #191c37;
+            border: 1px solid #646e96;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        #reasonContainer {
+            display: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-confirm {
+            background: #27ae60;
+            color: white;
+            border: none;
+        }
+
+        .modal-cancel {
+            background: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-info {
+            color: #95a5a6;
+            font-size: 14px;
+            margin-top: 5px;
+            margin-left: 10px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(231, 76, 60, 0.95);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            font-size: 20px;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .notification.success {
+            background: rgba(39, 174, 96, 0.95);
+        }
+
+        .notification.warning {
+            background: rgba(243, 156, 18, 0.95);
+        }
+
+        .notification.info {
+            background: rgba(52, 152, 219, 0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="panel-body">
+        <div class="glow-bottom-left"></div>
+
+        <nav>
+            <img src="https://iili.io/fn3h2Uu.md.png" alt="Logo">
+            <a href="#" class="nav-link" data-section="main"><i class="fa-solid fa-house"></i></a>
+            <a href="#" class="nav-link" data-section="first"><i class="fa-solid fa-users-viewfinder"></i></a>
+            <a href="#" class="nav-link" data-section="second"><i class="fa-solid fa-ban"></i></a>
+        </nav>
+
+        <div class="container">
+            <section id="main" class="active">
+                <h1>General</h1>
+                <div class="general-container">
+                    <div class="first-section">
+                        <div class="card">
+                            <div class="card-header"><div class="card-title">SERVER INFO</div></div>
+                            <div class="card-desc" id="servername">NAME : Vortex Anti-Cheat</div>
+                            <div class="card-desc" id="serverres">RESOURCES : 0</div>
+                            <div class="card-desc" id="serverup">RUN TIME : 1 DAY</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><div class="card-title">BANS INFO</div></div>
+                            <div class="card-desc" id="banscount">TOTAL BANS : 0</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><div class="card-title">PLAYERS INFO</div></div>
+                            <div class="card-desc" id="playerscount">CURRENT PLAYERS : 0</div>
+                        </div>
+                    </div>
+
+                    <div class="second-section">
+                        <div class="section-title">SERVER ACTIONS</div>
+                        <div class="section-actions">
+                            <div class="action-button" id="DelVehicles">Delete All Vehicles</div>
+                            <div class="action-button" id="DelObjects">Delete All Objects</div>
+                            <div class="action-button" id="DelPeds">Delete All Peds</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="first">
+                <h1>Players</h1>
+                <div class="action-conainer">
+                    <div style="display: flex; flex-direction: column; width: 40%;">
+                        <input type="text" id="SearchInput" placeholder="Search by Name or ID.." onkeyup="searchPlayers()">
+                        <div class="search-info">Search by name or player ID</div>
+                    </div>
+                    <div class="buttons-container">
+                        <div class="button" id="goto">GOTO</div>
+                        <div class="button" id="bring">BRING</div>
+                        <div class="button" id="ban">BAN</div>
+                        <div class="button" id="kick">KICK</div>
+                    </div>
+                </div>
+                <div class="tableContainer">
+                    <table id="PlayerTable">
+                        <tr class="header">
+                            <th style="width:15%;">PLAYER ID</th>
+                            <th style="width:20%;">NAME</th>
+                            <th style="width:15%;">IP PLAYER</th>
+                            <th style="width:15%;">License</th>
+                            <th style="width:20%;">DISCORD</th>
+                            <th style="width:15%;">PING</th>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <section id="second">
+                <h1>Bans</h1>
+                <div class="action-conainer">
+                    <div style="display: flex; flex-direction: column; width: 40%;">
+                        <input type="text" id="SearchInputCard" placeholder="Search by Name or Code.." onkeyup="searchBans()">
+                        <div class="search-info">Search by name or ban code</div>
+                    </div>
+                    <div class="buttons-container">
+                        <div class="button" id="unbanBtn">UNBAN BY CODE</div>
+                    </div>
+                </div>
+                <div class="BanContainer" id="ContainerBan"></div>
+            </section>
+        </div>
+    </div>
+
+    <div id="notificationContainer"></div>
+
+    <div id="actionModal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">ACTION</div>
+            <input type="text" class="modal-input" id="modalUserId" placeholder="PLAYER ID?">
+            <div id="reasonContainer">
+                <input type="text" class="modal-input" id="modalReason" placeholder="Reason">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-confirm" id="confirmAction">Confirm</button>
+                <button class="modal-btn modal-cancel" id="cancelAction">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="unbanModal">
+        <div class="modal-content">
+            <div class="modal-title">UNBAN PLAYER</div>
+            <input type="text" class="modal-input" id="unbanInput" placeholder="Enter Ban Code">
+            <div class="modal-buttons">
+                <button class="modal-btn modal-confirm" id="confirmUnban">Unban</button>
+                <button class="modal-btn modal-cancel" id="cancelUnban">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>devtools</title>
+</head>
+<body>
+
+<script src="index.js"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ocr</title>
+     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://unpkg.com/tesseract.js@5.0.2/dist/tesseract.min.js"></script>
+</head>
+<body style="background: transparent;">
+
+<script src="index.js"></script>
+
+</body>
+</html>
