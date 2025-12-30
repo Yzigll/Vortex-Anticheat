@@ -5,8 +5,8 @@
 ## Language Selection
 Choose your preferred language for the anticheat interface:
 
-- English language  
 - Arabic language  
+- English language
 
 Place the corresponding folder inside your server **resources** directory to use the desired language.
 
@@ -14,7 +14,7 @@ Place the corresponding folder inside your server **resources** directory to use
 
 ## Control Panel
 
-![Vortex Anticheat Control Panel](https://iili.io/fXaINvs.png)
+![Vortex Anticheat Control Panel](https://iili.io/fXabvea.png)
 
 **Features:**  
 - Ban players
